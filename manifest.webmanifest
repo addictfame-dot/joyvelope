@@ -1,0 +1,9 @@
+{
+  "name": "Joyvelope — Digital Gifts",
+  "short_name": "Joyvelope",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#110b20",
+  "theme_color": "#110b20",
+  "icons": [{"src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]
+}
