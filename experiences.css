@@ -134,3 +134,147 @@ body.joy-android, body.joy-android #app, body.joy-android #experience-app { min-
 .candle-out .flame {animation:jx-blow .48s ease both;}
 .legacy-candle-smoke {position:absolute;left:50%;bottom:133px;width:13px;height:31px;transform:translateX(-50%);border-radius:50%;border-left:3px solid #dbc0d0;opacity:0;filter:blur(1px);animation:jx-smoke 1.25s .14s ease both;}
 @media(prefers-reduced-motion:reduce) {.candle-out .flame,.legacy-candle-smoke{animation-duration:.01ms!important;animation-delay:0s!important}}
+
+/* Recipient styling reconstructed from the eight reference recordings. */
+.jx-stage {
+  --jx-serif: "Georgia", "Times New Roman", serif;
+  --jx-script: "URW Chancery L", "Apple Chancery", "Segoe Script", cursive;
+  --jx-grain: url("./assets/ref-paper-grain.png");
+  --jx-btn-fill: #b53a72;
+  --jx-btn-ink: #fff5eb;
+  background-color: #2a1930;
+  background: var(--jx-scene-bg, var(--recipe-bg)) center / cover;
+}
+.jx-stage .jx-layer { min-width: 0; }
+.jx-stage .jx-layer > h2 { font-family: var(--jx-serif); max-width: 19ch; }
+.jx-stage .jx-step { color: currentColor; opacity: .72; }
+.jx-stage .jx-btn.primary {
+  background: var(--jx-btn-fill); color: var(--jx-btn-ink);
+  box-shadow: inset 0 1px 0 #fff3, 0 4px 9px #48193122;
+}
+.jx-reference-art { display:block; width:min(218px,100%); height:auto; max-height:176px; object-fit:contain; }
+.jx-reference-art.small { width: min(116px,75%); max-height:125px; }
+.jx-stage .jx-decor { position:absolute; z-index:-1; inset:0; pointer-events:none; overflow:hidden; }
+.jx-stage .jx-decor img { position:absolute; height:auto; object-fit:contain; }
+.jx-tile .jx-thumb { isolation:isolate; }
+.jx-tile .jx-reference-art { max-height:101px; width:126px; }
+.jx-player.jx-immersive { max-width:none; padding:0; }
+.jx-immersive .jx-stage { min-height:calc(100svh - 66px); border-radius:0; box-shadow:none; }
+.jx-immersive .jx-actions .jx-btn:not(.primary):not(.yes):not(.no) { background:var(--recipe-paper); color:var(--recipe-paper-ink); }
+.jx-stage .jx-copy { line-height:1.55; }
+.jx-stage .jx-photo { transform:rotate(-4deg); box-shadow:0 5px 16px #41203343; }
+.jx-stage .jx-photo:nth-child(2n) { transform:rotate(5deg); }
+.jx-stage .jx-photo:nth-child(3n) { transform:rotate(-2deg); }
+
+.jx-birthday-party { --recipe-bg:url("./assets/ref-party-paper.png"); --recipe-ink:#422635; --recipe-accent:#a62865; }
+.jx-birthday-party.jx-stage .jx-layer > h2 { font-style:normal; font-weight:600; }
+.jx-birthday-party.kind-envelope .jx-layer { gap:10px; }
+.jx-birthday-party.kind-envelope .jx-object { min-height:162px; }
+.jx-birthday-party .jx-side-teddy { bottom:9px; left:clamp(12px,8%,76px); width:clamp(66px,16%,126px); transform:rotate(-8deg); }
+.jx-birthday-party.dark-room { --jx-scene-bg:url("./assets/ref-party-night.png"); --jx-btn-fill:#f5d76d; --jx-btn-ink:#3f2a44; background:var(--jx-scene-bg) center/cover; color:#fff1e3; }
+.jx-birthday-party.dark-room .jx-lamp { background:transparent; box-shadow:none; color:#e4bb89; }
+.jx-birthday-party.dark-room .jx-side-teddy { opacity:.36; }
+.jx-birthday-party.kind-lights.revealed { --jx-scene-bg:url("./assets/ref-party-lit.png"); }
+.jx-birthday-party.kind-lights.revealed .jx-object { min-height:114px; }
+.jx-birthday-party.kind-lights.revealed .jx-lamp { background:transparent; box-shadow:none; color:#b72f69; }
+.jx-birthday-party.kind-cakecut .jx-cut { height:144px; }
+.jx-birthday-party.kind-cakecut .jx-cut i { width:78px; height:105px; clip-path:polygon(0 41%,18% 41%,18% 19%,33% 19%,33% 0,100% 0,100% 100%,0 100%); border-radius:0; border:0; background:repeating-linear-gradient(to bottom,#f4d57a 0 12px,#ed82b2 12px 25px,#fff8dc 25px 39px,#b9acf2 39px 53px,#fff2d5 53px 62px); }
+.jx-birthday-party.kind-cakecut .jx-cut i:nth-child(2) { clip-path:polygon(0 0,67% 0,67% 19%,82% 19%,82% 41%,100% 41%,100% 100%,0 100%); }
+.jx-birthday-party.kind-cakecut .jx-cut:after { content:""; position:absolute; bottom:-5px;left:-11px;right:-11px;height:9px;background:#d4c5c7;border-radius:50%;z-index:-1; }
+
+.jx-birthday-secret { --recipe-bg:url("./assets/ref-secret-paper.png"); --recipe-ink:#821d43; --recipe-accent:#a72251; --jx-btn-fill:#ad1a49; }
+.jx-birthday-secret.kind-curtain:not(.revealed) { --jx-scene-bg:url("./assets/ref-velvet.png"); color:#ffe9b9; --jx-btn-fill:#f0c57d; --jx-btn-ink:#521d37; }
+.jx-birthday-secret.kind-curtain .jx-curtain { width:min(310px,100%); border-color:#d1a75c; }
+.jx-birthday-secret.kind-question .jx-layer > h2, .jx-birthday-secret.kind-candle .jx-layer > h2 {
+  font:800 clamp(1.65rem,6vw,3.05rem)/1.05 system-ui,sans-serif;
+  letter-spacing:-.045em; transform:rotate(-3deg);
+}
+.jx-birthday-secret.kind-pin { --jx-scene-bg:linear-gradient(90deg,#fbf2d9 0 49.85%,#9171ae 50%); color:#fff8eb; }
+.jx-birthday-secret.kind-pin .jx-layer { display:grid; grid-template-columns:1fr 1fr; }
+.jx-birthday-secret.kind-pin .jx-layer > :not(.jx-pin-art) { grid-column:2; }
+.jx-birthday-secret.kind-pin .jx-pin-art { grid-column:1; grid-row:1 / span 6; width:min(100%,215px); transform:rotate(-7deg); border:7px solid #b89ac9; background:#f7e4f0; box-shadow:0 5px 12px #67447b55; padding:8px; }
+.jx-birthday-secret.kind-pin .jx-layer > h2 { font-size:clamp(1.4rem,5vw,2.7rem); }
+.jx-birthday-secret.kind-pin .jx-keypad { width:min(100%,159px); }
+.jx-birthday-secret.kind-photos .jx-photo { border:8px dotted #dc7d9f; border-bottom:20px solid #ffe3eb; }
+.jx-birthday-secret.kind-letter { --jx-scene-bg:linear-gradient(135deg,#a085b6,#80609b); color:#fff7ee; }
+.jx-birthday-secret.kind-letter .jx-paper { background:transparent; color:inherit; border:0; box-shadow:none; font:1rem/1.65 "Courier New",monospace; text-align:center; }
+.jx-birthday-secret .jx-reveals.boxes .jx-btn { border-radius:47% 47% 48% 48%; min-width:74px; min-height:64px; border:3px solid #ee9aad; background:radial-gradient(circle at 35% 28%,#d34670,#8d173f 70%); }
+
+.jx-birthday-midnight { --recipe-bg:url("./assets/ref-midnight-stars.png"); --recipe-ink:#ffe6a0; --recipe-accent:#f5d382; --jx-btn-fill:#f0be67; --jx-btn-ink:#44212d; }
+.jx-birthday-midnight.jx-stage .jx-layer > h2 { font-style:normal; font-weight:700; }
+.jx-birthday-midnight .jx-box { background:linear-gradient(140deg,#f66db6,#a62883); box-shadow:0 0 40px #d54a996e; }
+.jx-birthday-midnight .jx-paper { --recipe-paper:#2d172c; --recipe-paper-ink:#fff0d2; border-color:#e8b9637a; }
+.jx-birthday-midnight .jx-keypad .jx-btn { background:#2a172c; border-color:#d9a64b8a; color:#ffe5a4; }
+.jx-birthday-midnight .jx-digits { color:#ffc167; text-shadow:0 0 11px #dfa05679; }
+.jx-birthday-midnight .jx-puzzle { background:#705236; padding:7px; border-radius:12px; box-shadow:0 0 25px #efc57744; }
+.jx-birthday-midnight .jx-puzzle button { color:#ffefb9; border-color:#af803d; background-color:#2b1a2e; }
+.jx-birthday-midnight .jx-scratch button { background-image:linear-gradient(145deg,#a73d92,#7250c3 54%,#e7479f); }
+.jx-birthday-midnight .jx-photo { border-color:#e5b76f; }
+
+.jx-anniversary { --recipe-bg:url("./assets/ref-anniversary-texture.png"); --recipe-ink:#fae8bb; --recipe-accent:#f3d08b; --jx-btn-fill:#f5e4c3; --jx-btn-ink:#59292a; }
+.jx-anniversary.jx-stage .jx-layer > h2 { font-family:var(--jx-script); }
+.jx-anniversary .jx-paper {
+  --recipe-paper:#f2ebd1; background:var(--jx-grain),var(--recipe-paper); color:#584033;
+  border:0; outline:2px dashed #a6795a86; outline-offset:-8px; border-radius:10px;
+  padding:22px 25px; filter:drop-shadow(0 5px 11px #2b151c48);
+}
+.jx-anniversary.kind-card .jx-paper { position:relative; min-height:120px; display:grid; align-content:center; }
+.jx-anniversary.kind-card .jx-paper .jx-ribbon { position:absolute; width:72px; top:-24px; left:-20px; transform:rotate(-21deg); }
+.jx-anniversary.kind-firsts .jx-list { gap:11px; grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr)); }
+.jx-anniversary.kind-firsts .jx-paper { font-style:italic; }
+.jx-anniversary.kind-calendar .jx-calendar { max-width:253px; }
+
+.jx-rose-gift { --recipe-bg:url("./assets/ref-cream-paper.png"); --recipe-ink:#702f3a; --recipe-accent:#92233f; --jx-btn-fill:#922d4d; }
+.jx-rose-gift.jx-stage .jx-layer > h2 { font-family:var(--jx-script); }
+.jx-rose-gift.kind-roses .jx-decor .jx-floral-left { width:min(42%,290px); top:-8%; left:-11%; opacity:.88; }
+.jx-rose-gift.kind-roses .jx-decor .jx-floral-right { width:min(45%,300px); bottom:-12%; right:-10%; transform:rotate(180deg); }
+.jx-rose-gift.kind-roses .jx-reference-art { max-width:145px; }
+.jx-rose-gift.kind-letter .jx-paper { background:#f0dfcf var(--jx-grain); font-family:var(--jx-script); font-size:clamp(1rem,3.5vw,1.42rem); padding:24px; max-width:540px; }
+.jx-rose-gift .jx-wall { width:min(100%,560px); gap:4px; }
+.jx-rose-gift .jx-wall .jx-photo { border-color:#fff6e8; border-bottom-width:19px; }
+
+.jx-love-mail { --recipe-bg:url("./assets/ref-love-red.png"); --recipe-ink:#fff0d4; --recipe-accent:#ffd594; --jx-btn-fill:#f9e4bd; --jx-btn-ink:#6f1d30; }
+.jx-love-mail.jx-stage .jx-layer > h2 { font-family:var(--jx-script); }
+.jx-love-mail .jx-ribbon { top:1%; right:-2%; width:min(26%,142px); transform:rotate(18deg); }
+.jx-love-mail .jx-gingham { bottom:-23px; left:-32px; width:132px; height:88px; position:absolute; transform:rotate(19deg); background:repeating-linear-gradient(90deg,#8e173c69 0 16px,transparent 16px 32px),repeating-linear-gradient(0deg,#aa184c77 0 16px,#f9d6be 16px 32px); border:4px solid #f7dcb3; }
+.jx-love-mail.kind-letter .jx-paper { color:#fff0dc; background:transparent; box-shadow:none; border:0; font-style:italic; }
+.jx-love-mail.kind-hub .jx-list { width:min(100%,420px); grid-template-columns:1fr 1fr; }
+.jx-love-mail.kind-hub .jx-list button { background:#fff0d4; padding:10px; min-height:56px; text-align:center; font-family:var(--jx-serif); }
+.jx-love-mail.kind-playlist { --jx-scene-bg:url("./assets/ref-cream-paper.png"); --recipe-ink:#572a39; }
+.jx-love-mail.kind-playlist .jx-list .jx-btn { background:#552394; color:#fff8ef; }
+.jx-love-mail.kind-playlist .jx-list .jx-btn:nth-child(2) { background:#14656a; }
+.jx-love-mail.kind-playlist .jx-list .jx-btn:nth-child(3) { background:#292030; }
+
+.jx-panda-sorry { --recipe-bg:url("./assets/ref-panda-flowers.png"); --recipe-ink:#48223d; --recipe-accent:#a83574; --jx-btn-fill:#923caa; }
+.jx-panda-sorry.kind-apology .jx-layer,.jx-panda-sorry.kind-finale .jx-layer { width:min(calc(100% - 34px),310px); background:#fff9fc; border:1px solid #fdf1f6; border-radius:14px; padding:20px; box-shadow:0 12px 24px #a6658b41; }
+.jx-panda-sorry.kind-apology .jx-mascot,.jx-panda-sorry.kind-finale .jx-mascot { grid-row:1; width:min(150px,70%); max-height:143px; object-fit:contain; }
+.jx-panda-sorry .jx-layer > h2 { font:800 clamp(1.5rem,5vw,2.2rem)/1.06 system-ui,sans-serif; letter-spacing:-.045em; }
+.jx-panda-sorry .jx-copy { font-size:.88rem; }
+.jx-panda-sorry .jx-btn.yes { background:#438c26; }
+.jx-panda-sorry .jx-btn.no { background:#be2547; }
+
+.jx-bunny-sorry { --recipe-bg:url("./assets/ref-bunny-scrapbook.png"); --recipe-ink:#7d274f; --recipe-accent:#a43c68; --jx-btn-fill:#f3e2ce; --jx-btn-ink:#6a3046; }
+.jx-bunny-sorry.jx-stage .jx-layer > h2 { font-style:normal; font-weight:700; }
+.jx-bunny-sorry .jx-paper,.jx-bunny-sorry .jx-game { box-shadow:0 5px 11px #7c3d5427; }
+.jx-bunny-sorry .jx-paper { --recipe-paper:#fae9d5; --recipe-paper-ink:#6a3d41; }
+.jx-bunny-sorry .jx-btn.primary { border:1px dashed #a7697a; }
+.jx-bunny-sorry .jx-game {
+  min-height:220px; background:#fff5f2; border:1px dashed #d29db3;
+  font-family:var(--jx-serif); box-shadow:inset 0 0 10px #eab9cd4f, 0 5px 15px #7c3d5423;
+}
+.jx-bunny-sorry .jx-game button { background:transparent; color:#aa3672; border:0; font-size:1.33rem; }
+.jx-bunny-sorry .jx-mascot { width:min(123px,64%); object-fit:contain; }
+.jx-bunny-sorry.kind-photos .jx-photo { border-style:solid; border-color:#ffefe2; }
+.jx-bunny-sorry.kind-finale .jx-layer { padding-bottom:57px; }
+
+@media (max-width:480px) {
+  .jx-immersive .jx-stage { min-height:calc(100svh - 65px); }
+  .jx-birthday-secret.kind-pin .jx-layer { grid-template-columns:1fr 1.24fr; gap:7px; }
+  .jx-birthday-secret.kind-pin .jx-pin-art { border-width:4px; }
+  .jx-birthday-secret.kind-pin .jx-keypad { gap:3px; }
+  .jx-birthday-secret.kind-pin .jx-keypad .jx-btn { padding-inline:2px; }
+  .jx-love-mail.kind-hub .jx-list { gap:5px; }
+}
+
+.jx-open-card { animation:jx-arrive .6s ease both; transform:rotate(-4deg); }
+.jx-open-card img { transform:rotate(-5deg) translateY(6px); }

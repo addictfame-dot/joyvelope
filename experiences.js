@@ -70,7 +70,14 @@ let sharing = false;
 let sharedUrl = "";
 const escape = value => String(value ?? "").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]);
 const asset = name => "./assets/"+name+".png";
-const drawing = name => '<img class="jx-mascot" src="'+asset(name)+'" alt="">';
+const referenceArt = (name, extra = "") =>
+  '<img class="jx-reference-art '+extra+'" src="./assets/ref-'+name+'.png" alt="">';
+const drawing = name => ["teddy","panda","penguin","bunny"].includes(name)
+  ? referenceArt(name, "jx-mascot") : '<img class="jx-mascot" src="'+asset(name)+'" alt="">';
+const coverArtwork = {
+  "birthday-party":"envelope", "birthday-secret":"teddy", "birthday-midnight":"rose-box",
+  "rose-gift":"rose-box", "love-mail":"envelope", "panda-sorry":"panda", "bunny-sorry":"bunny"
+};
 const action = (label,name,value="",more="") => '<button type="button" class="jx-btn '+more+'" data-action="'+name+'" data-val="'+value+'">'+escape(label)+'</button>';
 const type = () => templates[session.gift.id];
 const values = scene => scene.text.split("\n").map(v=>v.trim()).filter(Boolean);
@@ -115,7 +122,7 @@ function brand() {
   return '<header class="jx-head"><a href="#home"><img src="./icon.svg" alt=""> Joyvelope</a><a href="#experiences">All templates</a></header>';
 }
 function cards() {
-  return Object.entries(templates).map(([id,t])=>'<a href="#experience/'+id+'" class="jx-tile jx-'+id+'"><div class="jx-thumb">'+(t.mascot?drawing(t.mascot):'<span aria-hidden="true">'+({"rose-gift":"✿","love-mail":"✉","birthday-midnight":"✦"}[id]||"♡")+'</span>')+'</div><div><small>'+t.category+'</small><h2>'+escape(t.name)+'</h2><p>'+escape(t.subtitle)+'</p></div></a>').join("");
+  return Object.entries(templates).map(([id,t])=>'<a href="#experience/'+id+'" class="jx-tile jx-'+id+'"><div class="jx-thumb">'+(coverArtwork[id]?referenceArt(coverArtwork[id]):drawing(t.mascot))+'</div><div><small>'+t.category+'</small><h2>'+escape(t.name)+'</h2><p>'+escape(t.subtitle)+'</p></div></a>').join("");
 }
 function chooser() {
   root.innerHTML=brand()+'<main class="jx-wrap"><h1>Gift templates</h1><div class="jx-grid">'+cards()+'</div></main>';
@@ -142,7 +149,7 @@ function view() {
   if (session.view==="edit") {
     root.innerHTML=brand()+'<main class="jx-wrap"><h1>'+escape(t.name)+'</h1><div class="jx-layout">'+editForm()+screen+'</div></main>';
   } else {
-    root.innerHTML=brand()+'<main class="jx-wrap jx-player">'+(session.view==="preview"?'<div class="jx-actions">'+action("‹ Back to editor","edit")+'</div>':"")+screen+'</main>';
+    root.innerHTML=brand()+'<main class="jx-wrap jx-player'+(session.view==="recipient"?' jx-immersive':'')+'">'+(session.view==="preview"?'<div class="jx-actions">'+action("‹ Back to editor","edit")+'</div>':"")+screen+'</main>';
   }
   renderScene();
 }
@@ -171,6 +178,30 @@ function calendar(date) {
 function confetti() {
   return '<div class="jx-confetti" aria-hidden="true">'+Array.from({length:24},(_,i)=>'<i style="--x:'+((i*37)%100)+'%;--delay:'+((i%7)*35)+'ms;--h:'+((i*81)%360)+'"></i>').join("")+'</div>';
 }
+function sceneDecor(id, kind) {
+  if (id==="birthday-party" && ["envelope","lights","finale"].includes(kind)) {
+    return '<div class="jx-decor" aria-hidden="true">'+referenceArt("teddy","jx-side-teddy")+'</div>';
+  }
+  if (id==="rose-gift" && kind==="roses") {
+    return '<div class="jx-decor" aria-hidden="true">'+referenceArt("floral","jx-floral-left")+referenceArt("floral","jx-floral-right")+'</div>';
+  }
+  if (id==="love-mail") {
+    return '<div class="jx-decor" aria-hidden="true">'+referenceArt("ribbon","jx-ribbon")+'<div class="jx-gingham"></div></div>';
+  }
+  return "";
+}
+function sceneArt(id, kind) {
+  if (kind==="envelope" && ["birthday-party","love-mail","anniversary"].includes(id)) {
+    if (session.open) return '<div class="jx-open-card">'+referenceArt("envelope")+'</div>';
+    return referenceArt("envelope");
+  }
+  if (kind==="box" && id==="rose-gift") {
+    return session.open
+      ? '<div class="jx-open-card">'+referenceArt("floral")+'</div>' : referenceArt("rose-box");
+  }
+  if (kind==="roses") return referenceArt("floral");
+  return art[kind];
+}
 function renderScene(effect=false) {
   const stage=root.querySelector("#jx-stage");
   if (!stage || !session) return;
@@ -181,13 +212,13 @@ function renderScene(effect=false) {
   const advance=action(["envelope","box","lights","curtain","cakecut","candle"].includes(kind)?(s.after||"Continue →"):s.button,"next","","primary");
   let main="", buttons=advance, copy=kind==="calendar"?"":s.text;
   if (art[kind]) {
-    main='<div class="jx-object" aria-hidden="true">'+art[kind]+'</div>';
+    main='<div class="jx-object" aria-hidden="true">'+sceneArt(session.gift.id,kind)+'</div>';
     if (["envelope","box","lights","curtain","cakecut","candle"].includes(kind)&&!session.open) {
       buttons=action(s.button,"reveal","","primary");
     }
     if (kind==="envelope"&&session.open) main+='<div class="jx-letter-peek">For you ♡</div>';
   } else if (kind==="letter"||kind==="card") {
-    main='<article class="jx-paper">'+(kind==="card"&&t.mascot?drawing(t.mascot):"")+'<p>'+escape(s.text)+'</p></article>'; copy="";
+    main='<article class="jx-paper">'+(kind==="card"&&t.mascot?drawing(t.mascot):"")+(kind==="card"&&session.gift.id==="anniversary"?referenceArt("ribbon","jx-ribbon"):"")+'<p>'+escape(s.text)+'</p></article>'; copy="";
   } else if (kind==="calendar") {
     main=calendar(s.text);
   } else if (["list","firsts","playlist","hub"].includes(kind)) {
@@ -208,6 +239,7 @@ function renderScene(effect=false) {
     if (session.open) main='<p class="jx-paper">Unlocked ♡</p>';
     else buttons="";
     if (session.wrong) main+='<p role="status">Wrong PIN. Try again.</p>';
+    if (session.gift.id==="birthday-secret") main+=referenceArt("teddy","jx-pin-art");
   } else if (kind==="countdown") {
     main='<p class="jx-clock">00:'+String(session.count??8).padStart(2,"0")+'</p>';
     buttons=session.count===0?advance:session.count===null?action(s.button,"count","","primary"):"";
@@ -233,11 +265,11 @@ function renderScene(effect=false) {
       (session.count===0?'<p>You caught '+session.score+' '+(session.score===1?"heart":"hearts")+'. ♡</p>':"")+'</div>';
     buttons=session.count===0?advance:session.count===null?action(s.button,"game","","primary"):"";
   } else if (kind==="finale") {
-    main=t.mascot?drawing(session.gift.id==="panda-sorry"?"penguin":t.mascot):'<div class="jx-roses">✧ ♡ ✧</div>';
+    main=session.gift.id==="rose-gift"?referenceArt("floral","small"):t.mascot?drawing(session.gift.id==="panda-sorry"?"penguin":t.mascot):'<div class="jx-roses">✧ ♡ ✧</div>';
     buttons=action(s.button,"replay","","primary");
   }
   stage.className="jx-stage jx-"+session.gift.id+" kind-"+kind+(session.open?" revealed":"")+(kind==="lights"&&!session.open?" dark-room":"");
-  stage.innerHTML='<div class="jx-layer"><small class="jx-step">'+(n+1)+' / '+t.scenes.length+'</small><h2>'+escape(s.title)+'</h2>'+(copy?'<p class="jx-copy">'+escape(copy)+'</p>':"")+main+
+  stage.innerHTML=sceneDecor(session.gift.id,kind)+'<div class="jx-layer"><small class="jx-step">'+(n+1)+' / '+t.scenes.length+'</small><h2>'+escape(s.title)+'</h2>'+(copy?'<p class="jx-copy">'+escape(copy)+'</p>':"")+main+
     '<div class="jx-actions">'+navBack+buttons+(session.gift.id==="love-mail"&&n>1?action("Back to envelope","hub-home"):"")+'</div></div>'+(effect?confetti():"");
 }
 function goto(n,effect=false) {
