@@ -21,6 +21,7 @@ let previewStage = 'intro';
 let previewPage = 0;
 let rejectedShare = false;
 let hostedPending = false;
+let giftRouteVersion = 0;
 const startingView = route();
 
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -142,6 +143,8 @@ function envelope(name = 'Someone special', closed = false) {
   </div>`;
 }
 
+window.JoyRefreshHome = () => { if (route() === "home" && !/^#(?:experience|show=)/.test(location.hash)) render(); };
+
 function wordmark() {
   return nested
     ? '<span class="wordmark">Joyvelope</span>'
@@ -178,12 +181,12 @@ function header(view, giftOnly = false) {
   const link = (target, title, classes = '') => `<a href="#${target}" class="${classes}"${view === target ? ' aria-current="page"' : ''}>${title}</a>`;
   return `<header class="topbar${giftOnly ? ' gift-top' : ''}"><div class="wrap header">${wordmark()}
     ${giftOnly ? `<nav aria-label="Gift controls">${timelineGift.sound !== 'none' ? `<button type="button" class="btn ghost" data-action="sound" aria-pressed="${timeline.sound}">${timeline.sound ? 'Sound on' : 'Sound off'}</button>` : ''}${view === 'preview' ? link('create', 'Back to editor', 'nav-cta') : ''}</nav>`
-      : `<nav aria-label="Main">${link('templates', 'Templates', 'desktop-link')}${link('gifts', 'My gifts', 'desktop-link')}${link('premium', 'Premium', 'desktop-link')}${link('create', 'Create a gift ↗', 'btn primary nav-cta')}</nav>`}
+      : `<nav aria-label="Main">${link('experiences', 'Templates', 'desktop-link')}${link('gifts', 'My gifts', 'desktop-link')}${link('premium', 'Premium', 'desktop-link')}${link('experiences', 'Create a gift ↗', 'btn primary nav-cta')}</nav>`}
   </div></header>`;
 }
 
 function footer() {
-  return `<footer class="wrap footer"><small>Joyvelope · Personalised digital gifts</small><div class="actions"><a href="#gifts" class="text-link">My gifts</a><a href="#templates" class="text-link">Templates</a><a class="text-link" href="#premium">Premium</a></div></footer>`;
+  return `<footer class="wrap footer"><small>Joyvelope · Personalised digital gifts</small><div class="actions"><a href="#gifts" class="text-link">My gifts</a><a href="#experiences" class="text-link">Templates</a><a class="text-link" href="#premium">Premium</a></div></footer>`;
 }
 
 function cards(forEditor = false) {
@@ -203,11 +206,11 @@ function home() {
         <div class="eyebrow">Personalised digital gifts</div>
         <h1>Little surprises,<em>big feelings.</em></h1>
         <p>Put your favourite photos, a handwritten-style note and a few surprises into a gift they can open with a tap.</p>
-        <div class="actions"><a class="btn primary" href="#create">Create a gift <span aria-hidden="true">↗</span></a><a class="btn ghost" href="#demo"><span aria-hidden="true">▷</span> Open birthday demo</a></div>
+        <div class="actions"><a class="btn primary" href="#experiences">Create a gift <span aria-hidden="true">↗</span></a><a class="btn ghost" href="#demo"><span aria-hidden="true">▷</span> Open birthday demo</a></div>
       </div>
       <div class="hero-art" aria-hidden="true"><span class="hero-halo"></span><span class="art-star one">✦</span><span class="art-star two">✧</span><span class="art-star three">✦</span>${envelope('You')}</div>
     </div></section>
-    <section class="wrap section"><div class="section-head"><div><h2>Pick a gift to make</h2><p>Start with a template, then add your own memories.</p></div><a class="text-link" href="#templates">All templates ↗</a></div><div class="tile-grid">${cards()}</div></section>
+    <section class="wrap section"><div class="section-head"><div><h2>Pick a gift to make</h2><p>Start with a template, then add your own memories.</p></div><a class="text-link" href="#experiences">All templates ↗</a></div><div class="jx-grid">${window.JoyExperiences?.cards?.() ?? cards()}</div></section>
     <section class="pro-strip"><div class="wrap"><div><h2>Joyvelope Premium</h2><p>Premium themes and photo sharing are planned.</p></div><a class="btn ghost" href="#premium">See the ₹199 plan</a></div></section>
   </main>${footer()}`;
 }
@@ -325,7 +328,7 @@ function scene(gift, state, isPreview = false) {
         : `${openButton('', 'Open surprise', 'gift-next')}${next('Open your surprise →')}`}`;
   } else if (item === 'cake') {
     body = `<h2>${state.candleOut ? `Happy birthday, <em>${recipient}!</em>` : 'Make a wish'}</h2>
-      <div class="cake"><div class="plate"></div><div class="cake-body"></div><div class="frosting"></div><div class="candle"></div>${state.candleOut ? '' : '<div class="flame"></div><button type="button" data-action="candle" aria-label="Blow out the candle"></button>'}</div>
+      <div class="cake${state.candleOut ? ' candle-out' : ''}"><div class="plate"></div><div class="cake-body"></div><div class="frosting"></div><div class="candle"></div><div class="flame"></div>${state.candleOut ? '<div class="legacy-candle-smoke" aria-hidden="true"></div>' : '<button type="button" data-action="candle" aria-label="Blow out the candle"></button>'}</div>
       ${state.candleOut ? next('Pop the balloons →') : '<button class="btn primary" data-action="candle" type="button">Blow out the candle</button>'}`;
   } else if (item === 'balloons') {
     body = `<h2>Pop the balloons</h2><p>A little message is tucked inside each one.</p>
@@ -406,6 +409,7 @@ function showScene() {
 }
 
 function enter(view) {
+  const version = ++giftRouteVersion;
   stopSound();
   timeline = freshTimeline();
   rejectedShare = false;
@@ -415,8 +419,8 @@ function enter(view) {
     const token = hash.slice(2).split('&')[0];
     hostedPending = true;
     render(view);
-    loadHostedGift(token).then((gift) => { timelineGift = gift; hostedPending = false; timeline = freshTimeline(); render('gift'); })
-      .catch(() => { hostedPending = false; rejectedShare = true; render('gift'); });
+    loadHostedGift(token).then((gift) => { if (version !== giftRouteVersion || !location.hash.startsWith('#g=')) return; timelineGift = gift; hostedPending = false; timeline = freshTimeline(); render('gift'); })
+      .catch(() => { if (version !== giftRouteVersion || !location.hash.startsWith('#g=')) return; hostedPending = false; rejectedShare = true; render('gift'); });
     return;
   }
   if (view === 'gift') timelineGift = sharedGift();
@@ -812,7 +816,31 @@ app.addEventListener('submit', (event) => {
   window.scrollTo(0, 0);
 });
 
-window.addEventListener('hashchange', () => enter(route()));
+window.JoyHandleAndroidBack = () => {
+  if (window.JoyExperiences?.back?.()) return true;
+  const view = route();
+  if (['preview', 'demo', 'gift'].includes(view) && timeline.screen > 0) {
+    timeline = { ...freshTimeline(), screen: timeline.screen - 1 };
+    showScene();
+    return true;
+  }
+  if (view === 'create' && step > 0) {
+    step -= 1;
+    render();
+    window.scrollTo(0, 0);
+    return true;
+  }
+  if (view !== 'home') {
+    location.hash = view === 'preview' ? 'create' : 'home';
+    return true;
+  }
+  return false;
+};
+document.body.classList.toggle('joy-android', Boolean(window.JoyvelopeAndroid));
+window.addEventListener('hashchange', () => {
+  if (/^#(?:experiences$|experience\/|show=)/.test(location.hash)) return;
+  enter(route());
+});
 enter(startingView);
 if (!nested && 'serviceWorker' in navigator && ['http:', 'https:'].includes(location.protocol)) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});

@@ -16,12 +16,43 @@ const randomToken = () => {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return btoa(String.fromCharCode(...bytes)).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
 };
+const experienceScenes: Record<string, number> = {
+  "birthday-party": 7, "birthday-secret": 8, "birthday-midnight": 11,
+  "anniversary": 6, "rose-gift": 6, "love-mail": 7,
+  "panda-sorry": 2, "bunny-sorry": 6,
+};
+
+function cleanExperience(value: any) {
+  if (!value || value.version !== 1 || typeof value.id !== "string" ||
+      !Object.hasOwn(experienceScenes, value.id) || !/^\d{4}$/.test(value.pin) ||
+      !Array.isArray(value.scenes) || value.scenes.length !== experienceScenes[value.id]) {
+    throw new Error("Invalid experience");
+  }
+  const scenes = value.scenes.map((scene: any) => {
+    if (!scene || typeof scene.title !== "string" || scene.title.length > 120 ||
+        typeof scene.text !== "string" || scene.text.length > 1600 ||
+        typeof scene.button !== "string" || scene.button.length > 42) {
+      throw new Error("Invalid experience scene");
+    }
+    const result: Record<string,string> = { title: scene.title, text: scene.text, button: scene.button };
+    for (const [key,max] of [["after",42],["yes",42],["no",42],["decline",1600]] as const) {
+      if (scene[key] === undefined) continue;
+      if (typeof scene[key] !== "string" || scene[key].length > max) throw new Error("Invalid scene text");
+      result[key] = scene[key];
+    }
+    return result;
+  });
+  const result = { version: 1, id: value.id, pin: value.pin, scenes };
+  if (JSON.stringify(result).length > 11000) throw new Error("Experience is too long");
+  return result;
+}
+
 const safeGift = (input: any) => {
   if (!input || typeof input !== "object" || !["birthday", "letter", "memories"].includes(input.template)) throw new Error("Invalid gift");
   if (typeof input.recipient !== "string" || input.recipient.length > 50) throw new Error("Invalid recipient");
   if (typeof input.title !== "string" || input.title.length > 70 || typeof input.message !== "string" || input.message.length > 1200) throw new Error("Invalid gift text");
   const memories = Array.isArray(input.memories) ? input.memories.slice(0, 3).map((v: unknown) => typeof v === "string" ? v.slice(0, 110) : "") : ["", "", ""];
-  return { template: input.template, title: input.title, recipient: input.recipient, sender: typeof input.sender === "string" ? input.sender.slice(0, 50) : "", message: input.message, memories, theme: ["sunset", "moon", "rose"].includes(input.theme) ? input.theme : "sunset", sound: ["dream", "sparkle"].includes(input.sound) ? input.sound : "none", created: Date.now(), photos: [] };
+  return { template: input.template, title: input.title, recipient: input.recipient, sender: typeof input.sender === "string" ? input.sender.slice(0, 50) : "", message: input.message, memories, theme: ["sunset", "moon", "rose"].includes(input.theme) ? input.theme : "sunset", sound: ["dream", "sparkle"].includes(input.sound) ? input.sound : "none", created: Date.now(), photos: [], ...(input.experience === undefined ? {} : { experience: cleanExperience(input.experience) }) };
 };
 
 Deno.serve(async (request) => {
@@ -50,7 +81,8 @@ Deno.serve(async (request) => {
       return respond({ removed: expired?.length ?? 0 });
     }
     if (action === "create") {
-      const gift = safeGift(body.gift);
+      let gift;
+      try { gift = safeGift(body.gift); } catch { return respond({ error: "Invalid gift text or template." }, 400); }
       const photoCount = Number(body.photoCount);
       if (!Number.isInteger(photoCount) || photoCount < 0 || photoCount > 6) return respond({ error: "Choose up to six photos" }, 400);
       const token = randomToken();
@@ -59,7 +91,7 @@ Deno.serve(async (request) => {
       const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
       const { error } = await db.from("joyvelope_gifts").insert({ id, token_hash: await digest(token), revoke_hash: await digest(revokeToken), payload: gift, photo_count: photoCount, expires_at: expiresAt });
       if (error) throw error;
-      return respond({ token, revokeToken, expiresAt });
+      return respond({ token, revokeToken, expiresAt, ...(gift.experience ? { experienceVersion: 1 } : {}) });
     }
 
     if (action === "upload") {
